@@ -1,0 +1,6 @@
+# pip libraries required
+art
+climage
+pillow
+termcolor
+tabulate
