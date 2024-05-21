@@ -11,6 +11,7 @@ from utils.display_options import display_options
 from utils.use_joker import use_joker
 from utils.check_answer import check_answer
 from utils.start_quiz import start_quiz
+from utils.ask_for_answer import ask_for_answer
 
 ##### Flags quiz
 def flags(countries, player):
@@ -20,11 +21,10 @@ def flags(countries, player):
     # filter countries list of dict to make sure every country entry has a key for "flags" (url)
     countries = [c for c in countries if "flags" in c]
 
-    # get image of country flag in question (emoji are not used on Windows)
+    # get image of country flag in question
     try:
         image = get_flag(countries, right_index)
     except Exception as e:
-        print(e)
         sys.exit(e)
         # if flag could not be found, start another quiz
         # start_quiz(countries, player)
@@ -33,8 +33,8 @@ def flags(countries, player):
     print(image)
     print(f"To which country does this flag belong to?")
 
-    # create answer object
-    answers = []
+    # create answer_options object
+    answer_options = []
     n = 0
     for i in indexes:
         n += 1
@@ -43,21 +43,28 @@ def flags(countries, player):
             "name": countries[i]["name"]["common"],
             "right": True if i == right_index else False
         }
-        answers.append(answer_object)
+        answer_options.append(answer_object)
 
     # display answer options
-    display_options(answers)
+    display_options(answer_options)
 
     # get user input and check answers
-    right_answer = countries[right_index]["name"]["common"]
-    wants_joker = check_answer(answers, right_answer, player)
+    
+    player_answer: int = ask_for_answer(answer_options, player)
 
-    # if user wants to use joker display N/2 answer options
-    if wants_joker:
+    # if player_answer == 0 -> user wants Joker -> present question again with fewer options
+    if (player_answer) == 0:
         player.joker50 -= 1
-        reduced_answers = use_joker(answers)
-        display_options(reduced_answers)
-        check_answer(reduced_answers, right_answer, player, joker=True)
+        reduced_answer_options = use_joker(answer_options)
+        display_options(reduced_answer_options)
+        player_answer = ask_for_answer(reduced_answer_options, player, joker=True)
+
+    
+    # check if givven answer is the right one 
+    right_answer = countries[right_index]["name"]["common"]
+    check_answer(answer_options, player_answer, right_answer, player)
+    
+       
 
 
 # Helper function for flags quiz
@@ -67,7 +74,7 @@ def get_flag(countries, c):
     url = countries[c]["flags"]["png"]
 
     try:
-        r = requests.get("checkflix.io")
+        r = requests.get(url)
     except:
         raise Exception("Could not fetch flag")
     try:

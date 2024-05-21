@@ -10,7 +10,8 @@ def get_countries():
     if not (Path.cwd() / "countries.json").is_file():
         try:
             # fetch country data
-            r = requests.get("https://restcountries.com/v3.1/all", timeout=30) #?fields=name,flag,capital,flags
+            print("Fetching countries data")
+            r = requests.get("https://restcountries.com/v3.1/all", timeout=60) #?fields=name,flag,capital,flags
             raw = json.loads(r.text)
             json_object = json.dumps(raw, indent=4)
 
@@ -21,7 +22,7 @@ def get_countries():
             
         # error handling
         except:
-            sys.exit("Could not fetch countries from API, please restart")
+            sys.exit("Could not fetch countries from API, please make sure you are connected to the internet and restart")
         
 
     # Open json-data saved locally

@@ -4,3 +4,4 @@ climage
 pillow
 termcolor
 tabulate
+requests

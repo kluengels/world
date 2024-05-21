@@ -12,5 +12,5 @@ def use_joker(answers):
     # Filtering the list to remove the tow randomly selected wrong answers
     reduced_answers = [answer for answer in answers if answer['index'] not in indices_to_remove]
    
-    print("reduced", reduced_answers)^
+    print("reduced", reduced_answers)
     return reduced_answers
