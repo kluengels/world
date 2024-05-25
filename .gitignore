@@ -1,4 +1,4 @@
-/__pycache__
+__pycache__/*
 /countries.json
 /flag.png
 /scores.json

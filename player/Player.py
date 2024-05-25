@@ -82,9 +82,6 @@ class Player:
 
    
     def withdraw_life(self):
-        try: 
-            self._lifes -= 1
-        except ValueError:
-            raise ValueError("must be integer")
-
+        self._lifes -= 1
+        
 
