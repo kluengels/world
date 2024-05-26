@@ -17,7 +17,7 @@ class Player:
             joker_str = "joker"
         else:
             joker_str = "jokers"
-        return f"You have {self.lifes} lifes and {self.joker50} {joker_str} left."
+        return f"You have {self.lifes} lifes and {self.joker50} {joker_str} left.\n"
     
 
     #method to create new instance of Player

@@ -2,10 +2,12 @@
 
 import os
 import json
-from tabulate import tabulate # pretty print table
-from termcolor import colored, cprint # color text
+from tabulate import tabulate  # pretty print table
+from termcolor import colored, cprint  # color text
+
 
 def get_scores():
+    """read scores.json, load date into memory"""
     # create leaderboard file if it does not exit
     if not os.path.isfile("scores.json"):
         open("scores.json", "x")
@@ -14,22 +16,26 @@ def get_scores():
     with open("scores.json", "r") as file:
         try:
             file_data = json.load(file)
-            file_data = sorted(file_data, key=lambda item: item["points"], reverse=True)
+            file_data = sorted(
+                file_data, key=lambda item: item["_points"], reverse=True
+            )
         except:
             file_data = []
         return file_data
 
 
 def write_score(player):
+    """Append player object to file"""
     scores = get_scores()
     scores.append(player)
 
     # write to high scores file
     with open("scores.json", "w") as file:
-        json.dump(scores, file, default=vars, indent = 2)
+        json.dump(scores, file, default=vars, indent=2)
 
 
 def get_board(player):
+    """creates top 10 in table, player will be green if he reached top10"""
     # get scores
     scores = get_scores()
     top_scores = []
@@ -47,7 +53,7 @@ def get_board(player):
     # create top 10 list of objects
     for _ in range(r):
         try:
-            if top_scores[i - 1]["Points"] == scores[i]["points"]:
+            if top_scores[i - 1]["Points"] == scores[i]["_points"]:
                 rank = n
             else:
                 n += 1
@@ -62,12 +68,7 @@ def get_board(player):
         else:
             name = scores[i]["_name"]
 
-
-        item = {
-            "Rank": rank,
-            "Name": name,
-            "Points": scores[i]["points"]
-        }
+        item = {"Rank": rank, "Name": name, "Points": scores[i]["_points"]}
         top_scores.append(item)
         i += 1
 
