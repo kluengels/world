@@ -1,74 +1,19 @@
 ### Borders quiz: Which countries do not have a border with x?
 
-# import helper
-from project import (
-    start_quiz,
-    use_joker,
-    display_options,
-    get_random,
-    check_answer,
-    ask_for_answer,
-)
+
 import random
-import sys
-
-from termcolor import colored
 
 
-def borders(countries, player):
-    try:
-        # filter countries list of dict: only include countries with 3 or more neighbours
-        countries = [
-            c for c in countries if ("borders" in c and len(c["borders"]) >= 4 - 1)
-        ]
-        # choose four random countries
-        indexes, right_index = get_random(countries)
-
-        # get the country the question is about
-        q = countries[right_index]["name"]["common"]
-
-        # create answers_option object
-
-        answer_options = create_answer_options(countries, indexes, right_index, player)
-
-        # aks quiz question
-        print(f"Which country has no border with {q}?")
-
-        # display answer options
-        display_options(answer_options)
-
-        # get user input
-        player_answer: int = ask_for_answer(answer_options, player)
-
-        # if player_answer == 0 -> user wants Joker -> present question again with fewer options
-        if (player_answer) == 0:
-            player.joker50 -= 1
-            reduced_answer_options = use_joker(answer_options)
-            display_options(reduced_answer_options)
-            player_answer = ask_for_answer(reduced_answer_options, player, joker=True)
-
-        # check if given answer is the right one
-
-        right_answer = [a for a in answer_options if a["right"] == True][0]["name"]
-
-        result_text, color = check_answer(
-            answer_options, player_answer, right_answer, player
-        )
-        print(colored(result_text, color))
-
-    # if anythings goes wrong, start another quiz
-    except Exception as e:
-        start_quiz(countries, player)
-
-
-def create_answer_options(countries, indexes, right_index, player):
+def create_border_answers(countries, right_index):
     """Create list of dicts with countries as possible answer for multiple choice question"""
 
     # get code of countries with borders to that country
     neighbor_list = countries[right_index]["borders"]
     # restart quiz if selected country has less than 3 neighbors:
     if len(neighbor_list) < 3:
-        raise IndexError("Selected country has not enough neighbors")
+        from project import get_random
+        indexes, right_index = get_random(countries)
+        return create_border_answers(countries, right_index)
 
     # randomly select 3 countries out of neighbor list
     selected_neighbors = random.sample(neighbor_list, 3)
