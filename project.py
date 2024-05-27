@@ -68,26 +68,36 @@ def main():
 
 
 #### functions related to all quizzes (will be imported by quiz files)
-def start_quiz(player):
+def start_quiz(player, mode="unknown"):
     """Logic that all quizzes share"""
     try:
         # (1) load countries data
         countries = load_countries()
 
         # (2) randomly select game mode
-        modes = ["flags", "capitals", "population", "borders", "area"]
-        mode = random.choice(modes)
-        mode = "borders"
-        print(mode)
-        # mode = "area"
+        if mode == "unknown":
+            modes = ["flags", "capitals", "population", "borders", "area"]
+            mode = random.choice(modes)
+           
+       
         # (3) filter countries
         countries = filter_countries(countries, mode)
+        
 
         # (4) choose four random countries for questions
         indexes, right_index = get_random(countries)
+       
+
+
+        # Check if the selected country has less than three neighbors for the "borders" mode
+        if mode == "borders" and len(countries[right_index]["borders"]) < 3:
+            print(colored("Restart quiz", "red"))
+            return start_quiz(player, "borders")  # Restart the quiz
+
 
         # (5) create answer options
         answer_options = create_answer_options(countries, indexes, right_index, mode)
+        
 
         # (6) construct and print the question
         question = construct_question(countries, right_index, mode)
@@ -128,7 +138,6 @@ def start_quiz(player):
 
 ### helper functions for all quizzes
 
-
 def load_countries():
     """(1) Load countries data from local json file"""
     try:
@@ -143,7 +152,7 @@ def filter_countries(countries, mode):
     match mode:
         case "borders":
             # only include countries with borders
-            return [c for c in countries if "borders" in c]
+            return [c for c in countries if "borders" in c and len(c["borders"]) > 0]
         case "flags":
             #  make sure every country entry has a key for "flags" (url)
             return [c for c in countries if "flags" in c]
@@ -156,6 +165,23 @@ def filter_countries(countries, mode):
         case "area":
             # make sure every country object has a key for "area"
             return [c for c in countries if "area" in c]
+
+def get_random(countries):
+    """get N random countries"""
+    # select N random countries by index
+    indexes = []
+    n = 0
+    while n < 4:
+        i = random.randint(0, len(countries) - 1)
+        if i not in indexes:
+            indexes.append(i)
+            n += 1
+
+    # choose the country the question will be about
+    right_index = indexes[random.randint(0, len(indexes) - 1)]
+
+    return indexes, right_index
+
 
 
 def create_answer_options(countries, indexes, right_index, mode):
@@ -170,7 +196,7 @@ def create_answer_options(countries, indexes, right_index, mode):
         case "capitals":
             return capitals.create_capitals_answers(countries, indexes, right_index)
 
-        case "population":
+        case "population": 
             return population.create_population_answers(countries, indexes, right_index)
 
         case "area":
@@ -261,6 +287,7 @@ def check_answer(
 ):
     """(11) check if answer given by user is correct"""
     # check if answer is correct
+
     for a in answer_options:
         if a["index"] == player_answer:
             selected = a
@@ -279,21 +306,6 @@ def check_answer(
         )
 
 
-def get_random(countries):
-    """get N random countries"""
-    # select N random countries by index
-    indexes = []
-    n = 0
-    while n < 4:
-        i = random.randint(0, len(countries) - 1)
-        if i not in indexes:
-            indexes.append(i)
-            n += 1
-
-    # choose the country the question will be about
-    right_index = indexes[random.randint(0, len(indexes) - 1)]
-
-    return indexes, right_index
 
 
 ##### other functions

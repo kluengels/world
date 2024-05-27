@@ -1,7 +1,8 @@
 ### Borders quiz: Which countries do not have a border with x?
-### Todo: Bugfix: restarting quiz goes wrong
+
 
 import random
+
 
 
 def create_border_answers(countries, right_index):
@@ -9,12 +10,7 @@ def create_border_answers(countries, right_index):
 
     # get code of countries with borders to that country
     neighbor_list = countries[right_index]["borders"]
-    # restart quiz if selected country has less than 3 neighbors:
-    if len(neighbor_list) < 3:
-        from project import get_random
-        indexes, right_index = get_random(countries)
-        return create_border_answers(countries, right_index)
-
+   
     # randomly select 3 countries out of neighbor list
     selected_neighbors = random.sample(neighbor_list, 3)
 
@@ -22,10 +18,9 @@ def create_border_answers(countries, right_index):
     answer_options = []
 
     for s in selected_neighbors:
-
         # look up country
         neighbor = [c for c in countries if c["cca3"] == s][0]
-        # keep only common name and a indicator that answer is wrong
+        # keep only common name and add an indicator that the answer option is wrong ("right" = False)
         neighbor_reduced = {"name": neighbor["name"]["common"], "right": False}
         # append to answer options
         answer_options.append(neighbor_reduced)

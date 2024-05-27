@@ -1,5 +1,6 @@
 ### function to manually update countries.json file
 
+
 import requests  # http requests
 import json  # work with json data
 import sys
@@ -12,10 +13,11 @@ def main():
         print("Fetching countries data")
         r = requests.get(
             "https://restcountries.com/v3.1/all?fields=name,capital,flags,borders,population,area,region,cca3",
-            timeout=60,
+            timeout=120,
         )  # ?fields=name,capital,flags,borders,population,area,region,cca3
         raw = json.loads(r.text)
         json_object = json.dumps(raw, indent=4)
+
 
         # write to file
         with open("countries.json", "w") as file:
