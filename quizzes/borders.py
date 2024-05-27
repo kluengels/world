@@ -1,5 +1,5 @@
 ### Borders quiz: Which countries do not have a border with x?
-
+### Todo: Bugfix: restarting quiz goes wrong
 
 import random
 
