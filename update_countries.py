@@ -12,22 +12,29 @@ def main():
         # fetch country data
         print("Fetching countries data")
         r = requests.get(
-            "https://restcountries.com/v3.1/all?fields=name,capital,flags,borders,population,area,region,cca3",
+            "https://restcountries.com/v3.1/independent?status=true&fields=name,capital,flags,borders,population,area,region,cca3",
             timeout=120,
         )  # ?fields=name,capital,flags,borders,population,area,region,cca3
+        r.raise_for_status()
+       
+    
+        
         raw = json.loads(r.text)
         json_object = json.dumps(raw, indent=4)
 
+        
 
         # write to file
-        with open("countries.json", "w") as file:
+        with open("countries2.json", "w") as file:
             file.write(json_object)
         r.raise_for_status()
         print("Countries data updated")
 
     # error handling
-    except:
+    except Exception as e:
+        print(e)
         sys.exit(
+            
             "Could not fetch countries from API, please make sure you are connected to the internet and restart"
         )
 

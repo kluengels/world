@@ -1,6 +1,6 @@
 ## todo: testing, styling, unit tests, input options when joker is used
 # joker should remove 4 options when N = 6
-# limit countries to "offical" ones?
+# limit countries to "independent" ones?
 # rember countries that have been in quiz already, exclude from further quizzes
 
 
@@ -78,26 +78,24 @@ def start_quiz(player, mode="unknown"):
         if mode == "unknown":
             modes = ["flags", "capitals", "population", "borders", "area"]
             mode = random.choice(modes)
-           
-       
+
         # (3) filter countries
         countries = filter_countries(countries, mode)
-        
 
         # (4) choose four random countries for questions
         indexes, right_index = get_random(countries)
-       
 
+        # exclude that country from future quizz questions to avoid duplicate questions
+        player.add_exclude(right_index, mode)
+        # print(player.exclude)
 
         # Check if the selected country has less than three neighbors for the "borders" mode
         if mode == "borders" and len(countries[right_index]["borders"]) < 3:
             print(colored("Restart quiz", "red"))
             return start_quiz(player, "borders")  # Restart the quiz
 
-
         # (5) create answer options
         answer_options = create_answer_options(countries, indexes, right_index, mode)
-        
 
         # (6) construct and print the question
         question = construct_question(countries, right_index, mode)
@@ -138,6 +136,7 @@ def start_quiz(player, mode="unknown"):
 
 ### helper functions for all quizzes
 
+
 def load_countries():
     """(1) Load countries data from local json file"""
     try:
@@ -166,6 +165,7 @@ def filter_countries(countries, mode):
             # make sure every country object has a key for "area"
             return [c for c in countries if "area" in c]
 
+
 def get_random(countries):
     """get N random countries"""
     # select N random countries by index
@@ -183,7 +183,6 @@ def get_random(countries):
     return indexes, right_index
 
 
-
 def create_answer_options(countries, indexes, right_index, mode):
     """(5) prepare answer options"""
     match mode:
@@ -196,7 +195,7 @@ def create_answer_options(countries, indexes, right_index, mode):
         case "capitals":
             return capitals.create_capitals_answers(countries, indexes, right_index)
 
-        case "population": 
+        case "population":
             return population.create_population_answers(countries, indexes, right_index)
 
         case "area":
@@ -304,8 +303,6 @@ def check_answer(
             f"That's wrong. The right answer would have been {right_answer}.",
             "red",
         )
-
-
 
 
 ##### other functions

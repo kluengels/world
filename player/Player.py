@@ -1,15 +1,26 @@
 ### Player class
 import sys
-from player.leaderboard  import get_scores
+from player.leaderboard import get_scores
+
+
 class Player:
     # initialize object
-    def __init__(self, name, id = 1, lifes = 3, points = 0):
+    def __init__(
+        self,
+        name,
+        id=1,
+        lifes=3,
+        points=0,
+        exclude={"flags": [], "borders": [], "capitals": [], "population": [], "area": []},
+    ):
         # define instance variables
         self.name = name
         self.id = id
         self.points = points
         self.lifes = lifes
         self.joker50 = 1
+        # remember countries that have been subject to quiz question already
+        self.exclude = exclude
 
     # define print method
     def __str__(self):
@@ -18,9 +29,8 @@ class Player:
         else:
             joker_str = "jokers"
         return f"You have {self.lifes} lifes and {self.joker50} {joker_str} left.\n"
-    
 
-    #method to create new instance of Player
+    # method to create new instance of Player
     @classmethod
     def get(cls):
         while True:
@@ -66,7 +76,6 @@ class Player:
     def points(self, points):
         self._points = points
 
-
     def add_point(self):
         self._points += 1
 
@@ -74,14 +83,30 @@ class Player:
     @property
     def lifes(self):
         return self._lifes
-    
+
     # setter for lifes
     @lifes.setter
     def lifes(self, lifes):
         self._lifes = lifes
 
-   
     def withdraw_life(self):
         self._lifes -= 1
-        
 
+    # getter for exclude
+    @property
+    def exclude(self):
+        return self._exclude
+
+    # setter for exclude
+    @exclude.setter
+    def exclude(self, exclude):
+        self._exclude = exclude
+
+    def add_exclude(self, index, mode):
+        # if mode not in ["flags", "capitals", "borders", "population", "area"]:
+        #     raise KeyError("game mode {mode} does not exist")
+        # if type(index) is not int:
+        #     raise ValueError ("index value must be int")
+        print(self._exclude[mode])
+        # new_exclude_list = self._exclude[0][mode].append(index)
+        # self._exclude = new_exclude_list
