@@ -1,27 +1,17 @@
-## todo: testing, styling, unit tests, input options when joker is used
-# joker should remove 4 options when N = 6
-# limit countries to "independent" ones?
-# rember countries that have been in quiz already, exclude from further quizzes
+### A geo-quizz with 5 game modes
 
-
-### Imports
 import json  # work with json data
 import sys
-import random  # generate random numbers
+import random
 from art import *  # ascii-art
-from termcolor import colored, cprint  # color text
+from termcolor import colored  # color text
 
-
-# import helper function specific to certrain quizzes
+# import helper function specific to game modes
 from quizzes import flags, borders, capitals, population, area
 
 # everything related to Player
 from player.Player import Player
 from player.leaderboard import write_score, get_board
-
-
-# Configuration: Number of options for each question
-N = 4
 
 
 def main():
@@ -80,18 +70,18 @@ def start_quiz(player, mode="unknown"):
             mode = random.choice(modes)
 
         # (3) filter countries
-        countries = filter_countries(countries, mode)
+        countries = filter_countries(countries, mode, player)
 
         # (4) choose four random countries for questions
         indexes, right_index = get_random(countries)
 
-        # exclude that country from future quizz questions to avoid duplicate questions
-        player.add_exclude(right_index, mode)
-        # print(player.exclude)
+        # exclude that country from future quizz questions in same mode
+        # to avoid duplicate questions
+        player.add_exclude(countries[right_index]["cca3"], mode)
 
         # Check if the selected country has less than three neighbors for the "borders" mode
         if mode == "borders" and len(countries[right_index]["borders"]) < 3:
-            print(colored("Restart quiz", "red"))
+            # print(colored("Restart quiz", "red"))
             return start_quiz(player, "borders")  # Restart the quiz
 
         # (5) create answer options
@@ -131,7 +121,7 @@ def start_quiz(player, mode="unknown"):
     # if anythings go wrong, start a new quiz
     except (ValueError, IndexError) as e:
         print(colored(e, "magenta"))
-        start_quiz(player)
+        sys.exit()
 
 
 ### helper functions for all quizzes
@@ -146,29 +136,51 @@ def load_countries():
         sys.exit("Could not open the file countries.json")
 
 
-def filter_countries(countries, mode):
+def filter_countries(countries, mode, player):
     """(3) Filter countries list dependend on game mode"""
+    # exclude countries that have been subject to a quiz question in same game mode
+    exclude_list = player.exclude[mode]
+
     match mode:
         case "borders":
             # only include countries with borders
-            return [c for c in countries if "borders" in c and len(c["borders"]) > 0]
+            return [
+                c
+                for c in countries
+                if "borders" in c
+                and len(c["borders"]) > 0
+                and c["cca3"] not in exclude_list
+            ]
         case "flags":
             #  make sure every country entry has a key for "flags" (url)
-            return [c for c in countries if "flags" in c]
+            return [
+                c for c in countries if "flags" in c and c["cca3"] not in exclude_list
+            ]
         case "capitals":
             # make sure every country entry has a key for "capital"
-            return [c for c in countries if "capital" in c and len(c["capital"]) > 0]
+            return [
+                c
+                for c in countries
+                if "capital" in c
+                and len(c["capital"]) > 0
+                and c["cca3"] not in exclude_list
+            ]
         case "population":
             # make sure every country entry has a key for "population"
-            return [c for c in countries if "population" in c]
+            return [
+                c
+                for c in countries
+                if "population" in c and c["cca3"] not in exclude_list
+            ]
         case "area":
             # make sure every country object has a key for "area"
-            return [c for c in countries if "area" in c]
+            return [
+                c for c in countries if "area" in c and c["cca3"] not in exclude_list
+            ]
 
 
 def get_random(countries):
-    """get N random countries"""
-    # select N random countries by index
+    """get 4 random countries"""
     indexes = []
     n = 0
     while n < 4:
@@ -305,7 +317,7 @@ def check_answer(
         )
 
 
-##### other functions
+### other functions
 
 
 def welcome():

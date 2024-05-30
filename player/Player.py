@@ -11,7 +11,13 @@ class Player:
         id=1,
         lifes=3,
         points=0,
-        exclude={"flags": [], "borders": [], "capitals": [], "population": [], "area": []},
+        exclude={
+            "flags": [],
+            "borders": [],
+            "capitals": [],
+            "population": [],
+            "area": [],
+        },
     ):
         # define instance variables
         self.name = name
@@ -100,13 +106,15 @@ class Player:
     # setter for exclude
     @exclude.setter
     def exclude(self, exclude):
-        self._exclude = exclude
+        if isinstance(exclude, dict):
+            self._exclude = exclude
+        else:
+            raise ValueError("grades must be a dictionary")
 
-    def add_exclude(self, index, mode):
-        # if mode not in ["flags", "capitals", "borders", "population", "area"]:
-        #     raise KeyError("game mode {mode} does not exist")
-        # if type(index) is not int:
-        #     raise ValueError ("index value must be int")
-        print(self._exclude[mode])
+    def add_exclude(self, country_code, mode):
+        if mode not in ["flags", "capitals", "borders", "population", "area"]:
+            raise ValueError(f"game mode {mode} does not exist")
+        self._exclude[mode].append(country_code)
+        # print(self.exclude[mode])
         # new_exclude_list = self._exclude[0][mode].append(index)
         # self._exclude = new_exclude_list
