@@ -1,4 +1,4 @@
-from player.Player import Player
+from Player import Player
 
 from project import (
     load_countries,

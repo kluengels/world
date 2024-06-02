@@ -1,17 +1,17 @@
 ### A geo-quizz with 5 game modes
 
-import json  # work with json data
+import json  
 import sys
 import random
 from art import *  # ascii-art
 from termcolor import colored  # color text
 
-# import helper function specific to game modes
+# helper function specific to game modes
 from quizzes import flags, borders, capitals, population, area
 
-# everything related to Player
-from player.Player import Player
-from player.leaderboard import write_score, get_board
+# plyer class and leaderboard
+from Player import Player
+from leaderboard import write_score, get_board
 
 
 def main():
@@ -100,8 +100,7 @@ def start_quiz(player, mode="unknown"):
         if mode == "unknown":
             modes = ["flags", "capitals", "population", "borders", "area"]
             mode = random.choice(modes)
-        mode = "borders"
-
+        
         # (3) filter countries
         countries = filter_countries(countries, mode, player)
 
