@@ -1,5 +1,5 @@
 from player.Player import Player
-from player.leaderboard import get_scores, write_score
+
 from project import (
     load_countries,
     use_joker,
@@ -47,12 +47,6 @@ def test_add_points():
     new_player.points == 10
 
 
-def test_id():
-    """Id of a new player should be length of leaderboard + 1"""
-    length = len(get_scores())
-    player1 = Player("Player 1")
-    assert player1.id == length + 1
-
 
 ### Test on countries.json data
 def test_countries():
@@ -75,23 +69,6 @@ def test_countries():
     for k in keys_to_check:
         assert k in keys_to_check
 
-
-### Tests on leaderboard
-def test_write_score():
-    """Check if player data is appended"""
-
-    # create player for testing
-    player1 = Player("player1")
-    player1.add_point()  # player should now have 1 point
-
-    # write to file
-    write_score(player1)
-
-    # get scores
-    leaderboard = get_scores()
-
-    # check if player dict is in data
-    assert vars(player1) in leaderboard
 
 
 ### Tests on quiz functions

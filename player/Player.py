@@ -1,6 +1,5 @@
 ### Player class
 import sys
-from player.leaderboard import get_scores
 
 
 class Player:
@@ -8,7 +7,6 @@ class Player:
     def __init__(
         self,
         name,
-        id=1,
         lifes=3,
         points=0,
         exclude={
@@ -21,7 +19,6 @@ class Player:
     ):
         # define instance variables
         self.name = name
-        self.id = id
         self.points = points
         self.lifes = lifes
         self.joker50 = 1
@@ -41,10 +38,17 @@ class Player:
     def get(cls):
         while True:
             try:
-                name = input("Enter your name (Ctr+C to exit): ")
+                name = input("Enter your name (Ctr+C to exit): ").strip()
+                # reprompt user if username not valid
+                if name == "":
+                    continue
+                if len(name) > 8:
+                    print("Your username must not have more than 8 characters")
+                    continue
+                if not name.isalnum():
+                    print("Only alphanumeric characters allowed")
+                    continue
                 return cls(name)
-            except ValueError as e:
-                print(e)
             except KeyboardInterrupt:
                 print()
                 sys.exit("See you next time")
@@ -60,17 +64,6 @@ class Player:
         if not name:
             raise ValueError("Please enter a name")
         self._name = name
-
-    # getter for id
-    @property
-    def id(self):
-        return self._id
-
-    # setter for id
-    @id.setter
-    def id(self, id):
-        file_data = get_scores()
-        self._id = len(file_data) + 1
 
     # getter for points
     @property

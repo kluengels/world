@@ -1,76 +1,64 @@
 ### leaderboard
 
-import os
-import json
 from tabulate import tabulate  # pretty print table
-from termcolor import colored, cprint  # color text
+from termcolor import colored  # color text
+from cs50 import SQL
+from datetime import datetime
 
-
-def get_scores():
-    """read scores.json, load date into memory"""
-    # create leaderboard file if it does not exit
-    if not os.path.isfile("scores.json"):
-        open("scores.json", "x")
-
-    # read high score file
-    with open("scores.json", "r") as file:
-        try:
-            file_data = json.load(file)
-            file_data = sorted(
-                file_data, key=lambda item: item["_points"], reverse=True
-            )
-        except:
-            file_data = []
-        return file_data
+# set up database
+db = SQL("sqlite:///leaderboard.db")
 
 
 def write_score(player):
-    """Append player object to file"""
-    scores = get_scores()
-    scores.append(player)
+    """Append player  to leaderboard"""
+     # insert player into leaderboard and get id identifier back
+    id = db.execute(
+        "INSERT INTO leaderboard (name, score, date) VALUES(?, ?, ?)",
+        player.name,
+        player.points,
+        datetime.now(),
+    )
+    return id 
 
-    # write to high scores file
-    with open("scores.json", "w") as file:
-        json.dump(scores, file, default=vars, indent=2)
 
-
-def get_board(player):
+def get_board(id):
     """creates top 10 in table, player will be green if he reached top10"""
-    # get scores
-    scores = get_scores()
-    top_scores = []
+    # get top ten from database
+    results = db.execute(
+        "SELECT id, name, score, date FROM leaderboard ORDER BY score DESC LIMIT 10"
+    )
 
-    # helper: i keeps track of index, n keeps track of rank
-    n = 1
-    i = 0
+    # check if player is in top ten and mark his name 
+    player_object = [obj for obj in results if obj["id"] == id]
+    if (len(player_object)) == 1:
+        print("true")
+        index_of_player_object = results.index(player_object[0])
+        name = results[index_of_player_object]["name"]
+        # mark player in green
+        results[index_of_player_object]["name"] = colored(f"{name}", "green")
 
-    # leaderboard shall be Top 10 only
-    if len(scores) > 10:
-        r = 10
-    else:
-        r = len(scores)
+    # add rank to objects
+    results_with_rank = []
+    rank = 0
+    for i in range(len(results)):
+        # if first in list -> rank 1
+        if i == 0:
+            rank = 1
 
-    # create top 10 list of objects
-    for _ in range(r):
-        try:
-            if top_scores[i - 1]["Points"] == scores[i]["_points"]:
-                rank = n
-            else:
-                n += 1
-                rank = n
+        # if same score then player above -> rank does not change
+        elif results[i - 1]["score"] == results[i]["score"]:
+            rank = rank
 
-        except IndexError:
-            rank = n
-
-        # mark acutual player in top 10
-        if scores[i]["_id"] == player.id:
-            name = colored(f"{scores[i]['_name']}", "green")
+        # if score is lower -> increment rank
         else:
-            name = scores[i]["_name"]
+            rank += 1
 
-        item = {"Rank": rank, "Name": name, "Points": scores[i]["_points"]}
-        top_scores.append(item)
-        i += 1
+        # append new item with rank to results list
+        item = {"Rank": rank, "Name": results[i]["name"], "Score": results[i]["score"], "Date": results[i]["date"]}
+        results_with_rank.append(item)
 
-    # create table out of top 10
-    return tabulate(top_scores, headers="keys", tablefmt="outline")
+    # create table
+    table = f'{tabulate(results_with_rank, headers="keys", tablefmt="outline")}'
+
+    return table
+

@@ -17,10 +17,42 @@ from player.leaderboard import write_score, get_board
 def main():
     # welcome screen
     print(welcome())
+
+    # menu
+    print(
+        f'Type "start" to begin, "help" for a tutorial or "imprint" for the imprint, CTR+C to exit'
+    )
+    try:
+        while True:
+            command = input("Enter command: ").strip().lower()
+            if command == "start":
+                break
+            if command == "help":
+                print(
+                    f"\nWorld Quiz will ask you randomly generated questions about countries. "
+                    "You start with 3 lifes and 1 joker. The joker can be used one time to eliminate two answer options. "
+                    "If your answer is wrong, you loose one life. "
+                    "You will receive new questions as long as you have at least one life left.\n"
+                )
+                continue
+            if command == "imprint":
+                print(
+                    f"\nWorld Quiz is a project made by:\n\n"
+                    "Steffen Ermisch \n"
+                    "Pressebüro JP4\nRichard-Wagner-Str. 10-12\n50674 Köln, Germany\n"
+                    "https://steffen-ermisch.de\n\n"
+                    "Props to https://restcountries.com/ for providing the countries database!\n"
+                )
+                continue
+    except KeyboardInterrupt:
+        sys.exit()
+
     print()
 
     # ask user for name, will create a player instance from Player class
     player = Player.get()
+    print()
+    print(f"Let's go, {player.name}! 🌍")
     print()
 
     # As long as player more than one life ask him randomly new questions
@@ -33,14 +65,14 @@ def main():
 
     # game over if player has no lifes left
     print(
-        "Game over. You have reached the leaderboard if you find your name in green in the table."
+        f"Game over. You got {player.points} points. You have reached the leaderboard if you find your name in green in the table."
     )
 
     # write to leaderboard
-    write_score(player)
+    player_id = write_score(player)
 
     # print leaderboard
-    table = get_board(player)
+    table = get_board(player_id)
     print(table)
 
     # aks user if he wants to play another round
@@ -68,6 +100,7 @@ def start_quiz(player, mode="unknown"):
         if mode == "unknown":
             modes = ["flags", "capitals", "population", "borders", "area"]
             mode = random.choice(modes)
+        mode = "borders"
 
         # (3) filter countries
         countries = filter_countries(countries, mode, player)
@@ -118,10 +151,10 @@ def start_quiz(player, mode="unknown"):
         # (12) print result
         print(colored(result_text, color))
 
-    # if anythings go wrong, start a new quiz
-    except (ValueError, IndexError) as e:
-        print(colored(e, "magenta"))
-        sys.exit()
+    # if anythings goes wrong, start a new quiz
+    except (IndexError, ValueError):
+        # print(colored("index error", "magenta"))
+        start_quiz(player, mode)
 
 
 ### helper functions for all quizzes
@@ -325,9 +358,9 @@ def welcome():
     txt = "-" * 80 + "\n"
     Art = text2art("Welcome to")  # Return ASCII text (default font)
     txt += Art
-    Art = text2art("world quiz")
+    Art = text2art("World Quiz")
     txt += Art
-    txt += "-" * 80
+    txt += "-" * 80 + "\n\n"
     return txt
 
 
