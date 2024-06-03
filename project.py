@@ -1,6 +1,6 @@
 ### A geo-quizz with 5 game modes
 
-import json  
+import json
 import sys
 import random
 from art import *  # ascii-art
@@ -9,9 +9,16 @@ from termcolor import colored  # color text
 # helper function specific to game modes
 from quizzes import flags, borders, capitals, population, area
 
-# plyer class and leaderboard
+# player class and leaderboard
 from Player import Player
 from leaderboard import write_score, get_board
+
+# do not print debug messages
+import logging
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("PIL.PngImagePlugin").propagate = False
 
 
 def main():
@@ -100,7 +107,7 @@ def start_quiz(player, mode="unknown"):
         if mode == "unknown":
             modes = ["flags", "capitals", "population", "borders", "area"]
             mode = random.choice(modes)
-        
+
         # (3) filter countries
         countries = filter_countries(countries, mode, player)
 
