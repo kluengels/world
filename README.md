@@ -2,8 +2,7 @@
 
 #### Video Demo:
 
-not available yet
-<URL HERE>
+https://youtu.be/n1erZ8J9tJ8
 
 #### Web Version:
 
